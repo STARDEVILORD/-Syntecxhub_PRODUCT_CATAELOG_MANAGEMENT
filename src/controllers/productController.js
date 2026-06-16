@@ -1,7 +1,5 @@
 const Product = require('../models/Product');
 
-// @desc    Get all products (with Search, Filter, Sort, Pagination)
-// @route   GET /api/products
 exports.getProducts = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page, 10) || 1;
@@ -71,8 +69,6 @@ exports.getProducts = async (req, res, next) => {
     }
 };
 
-// @desc    Get single product
-// @route   GET /api/products/:id
 exports.getProduct = async (req, res, next) => {
     try {
         const product = await Product.findById(req.params.id);
@@ -83,8 +79,6 @@ exports.getProduct = async (req, res, next) => {
     }
 };
 
-// @desc    Create new product
-// @route   POST /api/products
 exports.createProduct = async (req, res, next) => {
     try {
         const product = await Product.create(req.body);
@@ -109,8 +103,6 @@ exports.updateProduct = async (req, res, next) => {
     }
 };
 
-// @desc    Delete product
-// @route   DELETE /api/products/:id
 exports.deleteProduct = async (req, res, next) => {
     try {
         const product = await Product.findByIdAndDelete(req.params.id);
