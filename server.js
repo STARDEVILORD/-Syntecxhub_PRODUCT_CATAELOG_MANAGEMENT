@@ -15,7 +15,16 @@ const app = express();
 connectDB();
 
 // Security & Utility Middleware
-app.use(helmet());
+// Security Middleware (Relaxed CSP for inline scripts)
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrcAttr: ["'unsafe-inline'"],
+        },
+    },
+}));
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
