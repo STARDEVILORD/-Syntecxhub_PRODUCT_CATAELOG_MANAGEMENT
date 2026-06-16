@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Catalog Management</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #0000ff;
+        color: #f8954ef4;
+        margin: 0;
+        padding: 20px;
+      }
+      h1,
+      h2 {
+        color: #0080ff;
+      }
+      .container {
+        max-width: 900px;
+        margin: auto;
+        background: rgb(0, 0, 0);
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .section {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      /* Inputs & Selects */
+      input[type="text"],
+      input[type="number"],
+      select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        background-color: white;
+      }
+
+      /* Buttons */
+      button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      button:hover {
+        background-color: #2980b9;
+      }
+      button.danger {
+        background-color: #e74c3c;
+      }
+      button.danger:hover {
+        background-color: #c0392b;
+      }
+      button.success {
+        background-color: #2ecc71;
+      }
+      button.success:hover {
+        background-color: #27ae60;
+      }
+
+      /* Table Styles */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        display: none;
+      }
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+      th {
+        background-color: #f88a42;
+        color: white;
+      }
+      td.mono {
+        font-family: monospace;
+        color: #e74c3c;
+        font-weight: bold;
+      }
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+
+      pre {
+        background-color: #ffffff;
+        color: #ff0000;
+        padding: 15px;
+        border-radius: 4px;
+        overflow-x: auto;
+        white-space: pre-wrap;
+      }
+      .flex-row {
+        display: flex;
+        gap: 10px;
+      }
+      .flex-row > div {
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Product Catalog Management</h1>
+
+      <div class="section">
+        <h2>1. Authentication</h2>
+        <div class="form-group">
+          <label for="token">Your JWT Token:</label>
+          <div class="flex-row">
+            <input
+              type="text"
+              id="token"
+              placeholder="Click 'Get Test Token' or paste token here..."
+            />
+            <button onclick="getToken()">Get Test Token</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>2. Create Product (POST)</h2>
+        <div class="flex-row">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="c-name" placeholder="Name Of The Product" />
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <input
+              type="text"
+              id="c-category"
+              placeholder="Name Of The Category"
+            />
+          </div>
+        </div>
+        <div class="flex-row">
+          <div class="form-group">
+            <label>Price</label>
+            <input type="number" id="c-price" placeholder="0.0" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label>Stock</label>
+            <input type="number" id="c-stock" placeholder="0" />
+          </div>
+        </div>
+        <div class="flex-row" style="gap: 10px; margin-top: 15px">
+          <button class="success" onclick="createProduct()">
+            Create Product
+          </button>
+          <button onclick="showSummary()" style="background-color: #f39c12">
+            Complete Preview (New Tab)
+          </button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>3. View Products (GET)</h2>
+        <button onclick="getProducts()">Refresh Product List</button>
+        <table id="products-table">
+          <thead>
+            <tr>
+              <th style="width: 10%">Index</th>
+              <th style="width: 40%">Item Name</th>
+              <th style="width: 50%">Item ID</th>
+            </tr>
+          </thead>
+          <tbody id="products-table-body"></tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <h2>4. Update Product (PUT)</h2>
+        <div class="form-group">
+          <label>Product to Update</label>
+          <select id="u-id">
+            <option value="">-- Fetch products to populate --</option>
+          </select>
+        </div>
+        <div class="flex-row">
+          <div class="form-group">
+            <label>New Price</label>
+            <input type="number" id="u-price" placeholder="0.0" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label>New Stock</label>
+            <input type="number" id="u-stock" placeholder="0.0" />
+          </div>
+        </div>
+        <button onclick="updateProduct()">Update Product</button>
+      </div>
+
+      <div class="section">
+        <h2>5. Delete Product (DELETE)</h2>
+        <div class="form-group">
+          <label>Product to Delete</label>
+          <select id="d-id">
+            <option value="">-- Fetch products to populate --</option>
+          </select>
+        </div>
+        <button class="danger" onclick="deleteProduct()">Delete Product</button>
+      </div>
+
+      <div class="section">
+        <h2>Server Response</h2>
+        <pre id="output">Responses will appear here...</pre>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE_URL = "/api";
+
+      // Print to console box
+      function printOutput(data) {
+        document.getElementById("output").textContent = JSON.stringify(
+          data,
+          null,
+          2,
+        );
+      }
+
+      // 1. Get Token
+      async function getToken() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/auth/token`);
+          const data = await res.json();
+          if (data.token) {
+            document.getElementById("token").value = data.token;
+            alert("Token retrieved successfully!");
+          }
+          printOutput(data);
+        } catch (error) {
+          printOutput({
+            error: error.message,
+            hint: "Is your Node server running?",
+          });
+        }
+      }
+
+      // 2. Create Product
+      async function createProduct() {
+        const token = document.getElementById("token").value;
+        if (!token) return alert("Please get a token first!");
+
+        const body = {
+          name: document.getElementById("c-name").value,
+          category: document.getElementById("c-category").value,
+          price: parseFloat(document.getElementById("c-price").value),
+          stock: parseInt(document.getElementById("c-stock").value),
+        };
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/products`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(body),
+          });
+          const responseData = await res.json();
+          printOutput(responseData);
+
+          if (responseData.success) {
+            getProducts(); // Auto-refresh table
+            alert("Product created successfully!");
+          } else {
+            alert(
+              "Failed to create: " +
+                (responseData.error || responseData.errors),
+            );
+          }
+        } catch (error) {
+          printOutput({ error: error.message });
+        }
+      }
+
+      // -- Preview in New Tab --
+      function showSummary() {
+        const name = document.getElementById("c-name").value || "N/A";
+        const category = document.getElementById("c-category").value || "N/A";
+        const price = document.getElementById("c-price").value || "0";
+        const stock = document.getElementById("c-stock").value || "0";
+
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Product Data Summary</title>
+                <style>
+                    body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 40px; background-color: #f4f4f9; color: #333; }
+                    .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                    h1 { color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 16px; }
+                    th, td { padding: 12px 15px; border: 1px solid #ddd; text-align: left; }
+                    th { background-color: #2c3e50; color: white; width: 35%; }
+                    tr:nth-child(even) { background-color: #f9f9f9; }
+                    .close-btn { display: inline-block; margin-top: 20px; padding: 10px 15px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; text-decoration: none; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>Data Summary Preview</h1>
+                    <table>
+                        <tr><th>Item Name</th><td>${name}</td></tr>
+                        <tr><th>Category</th><td>${category}</td></tr>
+                        <tr><th>Price</th><td>$${parseFloat(price).toFixed(2)}</td></tr>
+                        <tr><th>Current Stock</th><td>${stock} units</td></tr>
+                    </table>
+                    <button class="close-btn" onclick="window.close()">Close Preview</button>
+                </div>
+            </body>
+            </html>
+        `;
+
+        const blob = new Blob([htmlContent], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        const newWindow = window.open(url, "_blank");
+        if (!newWindow)
+          alert("Your browser blocked the new tab! Please allow pop-ups.");
+      }
+
+      // 3. Get All Products
+      async function getProducts() {
+        try {
+          const res = await fetch(`${API_BASE_URL}/products`);
+          const responseData = await res.json();
+          printOutput(responseData);
+
+          if (responseData.success && responseData.data) {
+            const tbody = document.getElementById("products-table-body");
+            const table = document.getElementById("products-table");
+            const updateSelect = document.getElementById("u-id");
+            const deleteSelect = document.getElementById("d-id");
+
+            tbody.innerHTML = "";
+            updateSelect.innerHTML =
+              '<option value="">-- Select a Product --</option>';
+            deleteSelect.innerHTML =
+              '<option value="">-- Select a Product --</option>';
+
+            if (responseData.data.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px;"><strong>No products found in the database.</strong></td></tr>`;
+            } else {
+              responseData.data.forEach((product, index) => {
+                // Table row
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td>${product.name}</td>
+                            <td class="mono">${product._id}</td>
+                        `;
+                tbody.appendChild(tr);
+
+                // Dropdown option
+                const optionHTML = `<option value="${product._id}">${product.name} (ID: ${product._id})</option>`;
+                updateSelect.insertAdjacentHTML("beforeend", optionHTML);
+                deleteSelect.insertAdjacentHTML("beforeend", optionHTML);
+              });
+            }
+            table.style.display = "table";
+          }
+        } catch (error) {
+          printOutput({ error: error.message });
+        }
+      }
+
+      // 4. Update Product
+      async function updateProduct() {
+        const token = document.getElementById("token").value;
+        const id = document.getElementById("u-id").value.trim();
+        if (!id)
+          return alert("Please select a Product from the dropdown to update!");
+
+        const body = {
+          price: parseFloat(document.getElementById("u-price").value),
+          stock: parseInt(document.getElementById("u-stock").value),
+        };
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/products/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(body),
+          });
+          const responseData = await res.json();
+          printOutput(responseData);
+
+          if (responseData.success) {
+            getProducts();
+            alert("Product updated successfully!");
+          } else {
+            alert(
+              "Failed to update: " +
+                (responseData.error || responseData.errors),
+            );
+          }
+        } catch (error) {
+          printOutput({ error: error.message });
+        }
+      }
+
+      // 5. Delete Product
+      async function deleteProduct() {
+        const token = document.getElementById("token").value;
+        const id = document.getElementById("d-id").value.trim();
+        if (!id)
+          return alert("Please select a Product from the dropdown to delete!");
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/products/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const responseData = await res.json();
+          printOutput(responseData);
+
+          if (responseData.success) {
+            getProducts();
+            alert("Product deleted successfully!");
+          } else {
+            alert("Failed to delete: " + responseData.error);
+          }
+        } catch (error) {
+          printOutput({ error: error.message });
+        }
+      }
+
+      // Load products immediately
+      window.addEventListener("DOMContentLoaded", () => {
+        getProducts();
+      });
+    </script>
+  </body>
+</html>
