@@ -16,7 +16,7 @@ const updateSchema = Joi.object({
     price: Joi.number().min(0),
     description: Joi.string().allow('', null),
     stock: Joi.number().integer().min(0)
-}).min(1); // Ensures at least one field is sent
+}).min(1);
 
 const validateProduct = (req, res, next) => {
     const { error } = productSchema.validate(req.body, { abortEarly: false });
