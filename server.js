@@ -14,7 +14,7 @@ const app = express();
 // Connect to Database
 connectDB();
 
-// Security Middleware (Relaxed CSP for inline scripts)
+// Security Middleware
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
