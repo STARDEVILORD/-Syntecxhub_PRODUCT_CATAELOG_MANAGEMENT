@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-// Schema for Creating (Strict - requires all fields)
+// Schema for Creating 
 const productSchema = Joi.object({
     name: Joi.string().min(2).max(100).required(),
     category: Joi.string().min(2).max(50).required(),
@@ -9,7 +9,7 @@ const productSchema = Joi.object({
     stock: Joi.number().integer().min(0).required()
 });
 
-// Schema for Updating (Flexible - fields are optional)
+// Schema for Updating
 const updateSchema = Joi.object({
     name: Joi.string().min(2).max(100),
     category: Joi.string().min(2).max(50),
